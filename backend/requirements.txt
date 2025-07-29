@@ -1,0 +1,9 @@
+Flask==2.3.3
+Flask-CORS==4.0.0
+SpeechRecognition==3.10.0
+gTTS==2.3.2
+PyAudio==0.2.11
+# For audio format conversion
+ffmpeg-python==0.2.0
+# Additional dependencies for Railway deployment
+Werkzeug==2.3.7
