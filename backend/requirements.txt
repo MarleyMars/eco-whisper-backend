@@ -1,9 +1,8 @@
 Flask==2.3.3
 Flask-CORS==4.0.0
-SpeechRecognition==3.10.0
 gTTS==2.3.2
-PyAudio==0.2.11
-# For audio format conversion
+# For audio processing and format conversion
+pydub==0.25.1
 ffmpeg-python==0.2.0
 # Additional dependencies for Railway deployment
 Werkzeug==2.3.7
