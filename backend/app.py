@@ -10,6 +10,7 @@ from gtts import gTTS
 import tempfile
 import subprocess
 import socket
+import speech_recognition as sr
 
 app = Flask(__name__)
 CORS(app)
@@ -442,6 +443,106 @@ def text_ask():
         
     except Exception as e:
         print(f"Error in text_ask: {e}")
+        return jsonify({'error': 'Internal server error'}), 500
+
+@app.route('/api/transcribe', methods=['POST'])
+def transcribe():
+    """Handle voice transcription"""
+    try:
+        if 'audio' not in request.files:
+            return jsonify({'error': 'No audio file provided'}), 400
+        
+        audio_file = request.files['audio']
+        user_id = request.form.get('user_id', None)  # Optional user ID
+        
+        if audio_file.filename == '':
+            return jsonify({'error': 'No audio file selected'}), 400
+        
+        # Save audio file temporarily with original extension
+        file_extension = os.path.splitext(audio_file.filename)[1] if audio_file.filename else '.wav'
+        temp_audio_path = f"temp_audio_{uuid.uuid4()}{file_extension}"
+        audio_file.save(temp_audio_path)
+        
+        # Convert to WAV if needed for speech recognition
+        wav_audio_path = temp_audio_path
+        if file_extension.lower() not in ['.wav', '.wave']:
+            wav_audio_path = f"temp_audio_{uuid.uuid4()}.wav"
+            try:
+                # Use ffmpeg to convert audio to WAV format
+                subprocess.run([
+                    'ffmpeg', '-i', temp_audio_path, 
+                    '-acodec', 'pcm_s16le', 
+                    '-ar', '16000', 
+                    '-ac', '1', 
+                    wav_audio_path,
+                    '-y'  # Overwrite output file
+                ], check=True, capture_output=True)
+            except (subprocess.CalledProcessError, FileNotFoundError):
+                # If ffmpeg is not available, try to use the original file
+                wav_audio_path = temp_audio_path
+                print("Warning: ffmpeg not available, using original audio file")
+        
+        # Transcribe audio using speech recognition
+        recognizer = sr.Recognizer()
+        try:
+            with sr.AudioFile(wav_audio_path) as source:
+                audio_data = recognizer.record(source)
+                try:
+                    transcript = recognizer.recognize_google(audio_data)
+                except sr.UnknownValueError:
+                    transcript = "I didn't catch that. Can you try again?"
+                except sr.RequestError:
+                    transcript = "Sorry, there was an error with the speech recognition service"
+        except Exception as e:
+            print(f"Error transcribing audio: {e}")
+            transcript = "I didn't catch that. Can you try again?"
+        
+        # Clean up temporary files
+        try:
+            os.remove(temp_audio_path)
+            if wav_audio_path != temp_audio_path:
+                os.remove(wav_audio_path)
+        except:
+            pass
+        
+        # Match intent and get response
+        intent = match_intent(transcript)
+        answer = get_response(intent, user_id)
+        
+        # Generate audio file
+        audio_filename = f"answer_{uuid.uuid4()}.mp3"
+        audio_path = os.path.join(os.getcwd(), audio_filename)
+        
+        if text_to_speech(answer, audio_path):
+            if os.environ.get('RAILWAY_ENVIRONMENT'):
+                # For Railway, construct URL using request
+                audio_url = f"{request.url_root.rstrip('/')}/{audio_filename}"
+            else:
+                audio_url = f"{BASE_URL}/{audio_filename}"
+        else:
+            audio_url = None
+        
+        # Save to database
+        conversation_id = str(uuid.uuid4())
+        conn = sqlite3.connect('eco_whisper_demo.db')
+        cursor = conn.cursor()
+        cursor.execute('''
+            INSERT INTO conversations (conversation_id, user_id, user_message, assistant_message, intent_matched)
+            VALUES (?, ?, ?, ?, ?)
+        ''', (conversation_id, user_id, transcript, answer, intent))
+        conn.commit()
+        conn.close()
+        
+        return jsonify({
+            'transcript': transcript,
+            'answer': answer,
+            'audio_url': audio_url,
+            'conversation_id': conversation_id,
+            'intent_matched': intent
+        })
+        
+    except Exception as e:
+        print(f"Error in transcribe: {e}")
         return jsonify({'error': 'Internal server error'}), 500
 
 @app.route('/api/usage/community/today', methods=['GET'])
