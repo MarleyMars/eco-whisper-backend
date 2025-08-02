@@ -157,7 +157,7 @@ def match_intent_enhanced(user_input):
             return "intent2"  # query_community_usage
     
     # Sustainability tip patterns - more specific matching
-    if any(phrase in user_input_lower for phrase in ['sustainability tip', 'eco tip', 'green tip', 'sustainable tip', 'give me a tip']):
+    if any(phrase in user_input_lower for phrase in ['green tips', 'eco tips', 'sustainability tips', 'sustainable tips', 'any green tips', 'any eco tips']):
         return "intent6"  # random_tip
     
     # Community comparison patterns - more specific matching
@@ -259,7 +259,7 @@ def get_response(intent_id, user_id=None):
     
     if not intent_data:
         conn.close()
-        return get_response_legacy(intent_id)
+        return "I'm here to help you live more sustainably! Ask me about electricity usage, appliance efficiency, or eco-friendly choices."
     
     intent_name, response_template, requires_data_access = intent_data
     
@@ -270,7 +270,8 @@ def get_response(intent_id, user_id=None):
         return response_template
     
     # For data-driven intents, query the database and format the response
-    today = date.today().isoformat()
+    # Use fixed sample data date instead of current date
+    today = "2025-01-23"  # Fixed sample data date
     
     try:
         if intent_name == 'query_electricity_today':
@@ -302,11 +303,12 @@ def get_response(intent_id, user_id=None):
         
         elif intent_name == 'compare_yesterday':
             if user_id:
+                yesterday = "2025-01-22"  # Fixed sample data date for yesterday
                 cursor.execute('''
                     SELECT kwh_used FROM Electricity_Usage 
                     WHERE user_id = ? AND date IN (?, ?)
                     ORDER BY date DESC
-                ''', (user_id, today, (date.today() - timedelta(days=1)).isoformat()))
+                ''', (user_id, today, yesterday))
                 usage_data = cursor.fetchall()
                 if len(usage_data) >= 2:
                     today_kwh, yesterday_kwh = usage_data[0][0], usage_data[1][0]
@@ -431,24 +433,12 @@ def get_response(intent_id, user_id=None):
     
     conn.close()
     
-    # Fallback to legacy response
-    return get_response_legacy(intent_id)
+    # Fallback to default response
+    return "I'm here to help you live more sustainably! Ask me about electricity usage, appliance efficiency, or eco-friendly choices."
 
-def get_response_legacy(intent):
-    """Legacy response system for backward compatibility"""
-    responses = {
-        "electricity_today": "You used 5.6 kilowatt-hours today, which cost about 2.45 dollars.",
-        "electricity_save": "To save electricity, try using LED bulbs, unplug devices when not in use, and run appliances during off-peak hours.",
-        "electricity_cost": "Your current electricity rate is about 44 cents per kilowatt-hour. Consider switching to renewable energy providers.",
-        "dishwasher_time": "The best time to run your dishwasher is during off-peak hours (10 PM - 6 AM) when renewable energy is more prevalent on the grid. Also, only run it when full and use the eco-mode if available!",
-        "dishwasher_save": "To save energy with your dishwasher, only run full loads, use eco-mode, and skip the heated dry cycle.",
-        "laundry_time": "The greenest time to wash laundry is during off-peak hours (10 PM - 6 AM) when the grid uses more renewable energy. Also, wash with cold water to save 90% of the energy!",
-        "laundry_save": "To save energy with laundry, use cold water, wash full loads, and air dry when possible.",
-        "milk_comparison": "Oat milk is generally more eco-friendly than almond milk. It uses less water and produces fewer greenhouse gases. However, both are better than dairy milk for the environment.",
-        "daily_tip": "Here's a sustainable tip for today: Try using a reusable water bottle instead of disposable plastic bottles. This simple change can save hundreds of plastic bottles per year!",
-        "general_eco": "I'm here to help you live more sustainably! Ask me about electricity usage, appliance efficiency, or eco-friendly choices."
-    }
-    return responses.get(intent, "I'm here to help you live more sustainably! Ask me about electricity usage, appliance efficiency, or eco-friendly choices.")
+
+
+
 
 def text_to_speech(text, filename):
     """Convert text to speech and save as MP3"""
@@ -612,7 +602,7 @@ def transcribe():
 def community_usage_today():
     """Get community usage for today"""
     try:
-        today = date.today().isoformat()
+        today = "2025-01-23"  # Fixed sample data date
         
         conn = sqlite3.connect('eco_whisper_demo.db')
         cursor = conn.cursor()
@@ -650,7 +640,7 @@ def community_usage_today():
 def user_usage_today(user_id):
     """Get user's electricity usage for today"""
     try:
-        today = date.today().isoformat()
+        today = "2025-01-23"  # Fixed sample data date
         
         conn = sqlite3.connect('eco_whisper_demo.db')
         cursor = conn.cursor()
