@@ -151,6 +151,19 @@ def match_intent_enhanced(user_input):
     """Enhanced intent matching for better accuracy"""
     user_input_lower = user_input.lower()
     
+    # Community usage patterns - more specific matching
+    if any(phrase in user_input_lower for phrase in ['community use', 'community usage', 'neighborhood use', 'neighborhood usage']):
+        if any(word in user_input_lower for word in ['today', 'did', 'how much']):
+            return "intent2"  # query_community_usage
+    
+    # Sustainability tip patterns - more specific matching
+    if any(phrase in user_input_lower for phrase in ['sustainability tip', 'eco tip', 'green tip', 'sustainable tip', 'give me a tip']):
+        return "intent6"  # random_tip
+    
+    # Community comparison patterns - more specific matching
+    if any(phrase in user_input_lower for phrase in ['green compared', 'greener than', 'compared to others', 'community comparison', 'how green am i']):
+        return "intent9"  # compare_community
+    
     # Specific patterns for the problematic questions
     if any(phrase in user_input_lower for phrase in ['greenest time', 'best time to use power', 'greenest time to use power']):
         return "intent4"  # greenest_time
@@ -158,12 +171,6 @@ def match_intent_enhanced(user_input):
     if any(phrase in user_input_lower for phrase in ['carbon dioxide', 'co2', 'co₂', 'carbon']):
         if any(word in user_input_lower for word in ['save', 'saved', 'reduced']):
             return "intent5"  # query_co2_saved
-    
-    if any(phrase in user_input_lower for phrase in ['sustainability tip', 'eco tip', 'green tip', 'sustainable tip']):
-        return "intent6"  # random_tip
-    
-    if any(phrase in user_input_lower for phrase in ['green compared', 'greener than', 'compared to others', 'community comparison']):
-        return "intent9"  # compare_community
     
     if any(phrase in user_input_lower for phrase in ['summarize', 'summary', 'green behavior', 'eco behavior']):
         if any(word in user_input_lower for word in ['today', 'daily']):
@@ -175,7 +182,7 @@ def match_intent_enhanced(user_input):
             return "intent1"  # query_electricity_today
         elif any(word in user_input_lower for word in ['save', 'reduce', 'lower', 'cut']):
             return "electricity_save"
-        elif any(word in user_input_lower for word in ['cost', 'bill', 'money', 'dollars']):
+        elif any(word in user_input_lower for word in ['cost', 'bill', 'money', 'dollars', 'euros']):
             return "electricity_cost"
     
     # Appliance-specific patterns
@@ -278,7 +285,7 @@ def get_response(intent_id, user_id=None):
                     return response_template.format(kwh=kwh, cost=cost)
             
             # Fallback to sample data
-            return response_template.format(kwh=5.6, cost=2.45)
+            return response_template.format(kwh=5.6, cost=2.08)
         
         elif intent_name == 'query_community_usage':
             cursor.execute('''
@@ -364,12 +371,12 @@ def get_response(intent_id, user_id=None):
                 if cost_data and cost_data[0]:
                     # Assume baseline cost and calculate savings
                     total_cost = cost_data[0]
-                    baseline_cost = 20.0  # Weekly baseline
+                    baseline_cost = 17.0  # Weekly baseline in euros
                     savings = max(0, baseline_cost - total_cost)
                     return response_template.format(money=savings)
             
             # Fallback
-            return response_template.format(money=3.50)
+            return response_template.format(money=2.98)
         
         elif intent_name == 'compare_community':
             if user_id:

@@ -8,23 +8,23 @@ INSERT OR REPLACE INTO users (user_id, username, email) VALUES
 
 -- Insert Intent data
 INSERT OR REPLACE INTO Intent (intent_id, name, description, requires_data_access, response_template, question_patterns) VALUES
-('intent1', 'query_electricity_today', 'how much electricity did I use today', 1, 'You used {kwh} kilowatt-hours today, which cost about {cost} dollars.', '["how much electricity did I use today", "what is my electricity usage today", "how much power did I use today", "electricity usage today"]'),
-('intent2', 'query_community_usage', 'how much did my community use today', 1, 'Your community used an average of {avg_kwh} kilowatt-hours per person today.', '["how much did my community use today", "community electricity usage", "neighborhood power consumption"]'),
+('intent1', 'query_electricity_today', 'how much electricity did I use today', 1, 'You used {kwh} kilowatt-hours today, which cost about {cost} euros.', '["how much electricity did I use today", "what is my electricity usage today", "how much power did I use today", "electricity usage today"]'),
+('intent2', 'query_community_usage', 'how much did my community use today', 1, 'Your community used an average of {avg_kwh} kilowatt-hours per person today.', '["how much did my community use today", "community electricity usage", "neighborhood power consumption", "how much did my community use today", "community usage today"]'),
 ('intent3', 'compare_yesterday', 'am I using more or less than yesterday', 1, 'You used {compare} electricity today, {diff} kilowatt-hours {compare_text}.', '["am I using more or less than yesterday", "compare today vs yesterday", "electricity usage comparison"]'),
 ('intent4', 'greenest_time', 'what is the greenest time to use power', 0, 'The greenest time to use electricity is {green_time}.', '["what is the greenest time to use power", "best time to use electricity", "greenest time for power", "greenest time to use power", "when is the best time to use electricity"]'),
 ('intent5', 'query_co2_saved', 'how much carbon dioxide did I save today', 1, 'You saved {co2} kilograms of carbon dioxide today.', '["how much carbon dioxide did I save today", "carbon dioxide saved", "environmental impact today", "how much CO₂ did I save today", "co2 saved today", "carbon saved today"]'),
-('intent6', 'random_tip', 'give me a sustainability tip', 1, 'Here is a tip: {tip}', '["give me a sustainability tip", "eco tip", "green advice", "sustainability tip", "sustainable tip", "eco-friendly tip"]'),
+('intent6', 'random_tip', 'give me a sustainability tip', 1, 'Here is a tip: {tip}', '["give me a sustainability tip", "eco tip", "green advice", "sustainability tip", "sustainable tip", "eco-friendly tip", "give me a sustainability tip"]'),
 ('intent7', 'query_water_saved', 'how much water did I save', 1, 'You saved {water} liters of water today.', '["how much water did I save", "water conservation", "water usage saved"]'),
-('intent8', 'query_money_saved_week', 'how much money did I save this week', 1, 'You saved {money} dollars this week.', '["how much money did I save this week", "weekly savings", "cost savings this week"]'),
-('intent9', 'compare_community', 'how green am I compared to others', 1, 'You used {compare} electricity than your community average, {diff} kilowatt-hours {compare_text}.', '["how green am I compared to others", "community comparison", "am I greener than others", "how green am I compared to others", "green compared to others"]'),
+('intent8', 'query_money_saved_week', 'how much money did I save this week', 1, 'You saved {money} euros this week.', '["how much money did I save this week", "weekly savings", "cost savings this week"]'),
+('intent9', 'compare_community', 'how green am I compared to others', 1, 'You used {compare} electricity than your community average, {diff} kilowatt-hours {compare_text}.', '["how green am I compared to others", "community comparison", "am I greener than others", "how green am I compared to others", "green compared to others", "how green am I compared to others"]'),
 ('intent10', 'summary_today', 'summarize my green behavior today', 1, 'Today you used {kwh} kilowatt-hours and saved {co2} kilograms of CO2.', '["summarize my green behavior today", "today summary", "daily eco summary", "green behavior today", "eco behavior summary"]');
 
 -- Insert sample electricity usage data
 INSERT OR REPLACE INTO Electricity_Usage (usage_id, user_id, date, kwh_used, estimated_cost, is_peak_time) VALUES
-('usage1', 'user1', '2025-01-23', 5.6, 2.45, 0),
-('usage2', 'user1', '2025-01-22', 6.2, 2.72, 1),
-('usage3', 'user2', '2025-01-23', 4.8, 2.11, 0),
-('usage4', 'user2', '2025-01-22', 5.1, 2.24, 0);
+('usage1', 'user1', '2025-01-23', 5.6, 2.08, 0),
+('usage2', 'user1', '2025-01-22', 6.2, 2.31, 1),
+('usage3', 'user2', '2025-01-23', 4.8, 1.79, 0),
+('usage4', 'user2', '2025-01-22', 5.1, 1.90, 0);
 
 -- Insert community statistics
 INSERT OR REPLACE INTO Community_Stats (stat_id, community_id, date, avg_kwh_per_user, total_co2_saved) VALUES
