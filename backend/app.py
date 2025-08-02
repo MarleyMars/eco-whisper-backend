@@ -152,20 +152,20 @@ def match_intent_enhanced(user_input):
     user_input_lower = user_input.lower()
     
     # Community usage patterns - more specific matching
-    if any(phrase in user_input_lower for phrase in ['community use', 'community usage', 'neighborhood use', 'neighborhood usage']):
+    if any(phrase in user_input_lower for phrase in ['community use', 'community usage', 'neighborhood use', 'neighborhood usage', 'how much did my community use']):
         if any(word in user_input_lower for word in ['today', 'did', 'how much']):
             return "intent2"  # query_community_usage
     
     # Sustainability tip patterns - more specific matching
-    if any(phrase in user_input_lower for phrase in ['green tips', 'eco tips', 'sustainability tips', 'sustainable tips', 'any green tips', 'any eco tips']):
+    if any(phrase in user_input_lower for phrase in ['green tips', 'eco tips', 'sustainability tips', 'sustainable tips', 'any green tips', 'any eco tips', 'any green tips for today']):
         return "intent6"  # random_tip
     
     # Community comparison patterns - more specific matching
-    if any(phrase in user_input_lower for phrase in ['green compared', 'greener than', 'compared to others', 'community comparison', 'how green am i']):
+    if any(phrase in user_input_lower for phrase in ['green compared', 'greener than', 'compared to others', 'community comparison', 'how green am i', 'how green am i compared to others']):
         return "intent9"  # compare_community
     
     # Specific patterns for the problematic questions
-    if any(phrase in user_input_lower for phrase in ['greenest time', 'best time to use power', 'greenest time to use power']):
+    if any(phrase in user_input_lower for phrase in ['greenest time', 'best time to use power', 'greenest time to use power', "what's the greenest time to use power"]):
         return "intent4"  # greenest_time
     
     if any(phrase in user_input_lower for phrase in ['carbon dioxide', 'co2', 'co₂', 'carbon']):
@@ -312,7 +312,7 @@ def get_response(intent_id, user_id=None):
                 usage_data = cursor.fetchall()
                 if len(usage_data) >= 2:
                     today_kwh, yesterday_kwh = usage_data[0][0], usage_data[1][0]
-                    diff = abs(today_kwh - yesterday_kwh)
+                    diff = round(abs(today_kwh - yesterday_kwh), 2)
                     compare = "more" if today_kwh > yesterday_kwh else "less"
                     compare_text = "more than yesterday" if today_kwh > yesterday_kwh else "less than yesterday"
                     return response_template.format(compare=compare, diff=diff, compare_text=compare_text)
@@ -374,7 +374,7 @@ def get_response(intent_id, user_id=None):
                     # Assume baseline cost and calculate savings
                     total_cost = cost_data[0]
                     baseline_cost = 17.0  # Weekly baseline in euros
-                    savings = max(0, baseline_cost - total_cost)
+                    savings = round(max(0, baseline_cost - total_cost), 2)
                     return response_template.format(money=savings)
             
             # Fallback
@@ -399,7 +399,7 @@ def get_response(intent_id, user_id=None):
                 if user_usage and community_avg:
                     user_kwh = user_usage[0]
                     avg_kwh = community_avg[0]
-                    diff = abs(user_kwh - avg_kwh)
+                    diff = round(abs(user_kwh - avg_kwh), 2)
                     compare = "less" if user_kwh < avg_kwh else "more"
                     compare_text = "than your community average"
                     return response_template.format(compare=compare, diff=diff, compare_text=compare_text)
